@@ -22,19 +22,19 @@ class player:
         self.playerYVelocity = playerYVelocity
         self.playerWidth = playerWidth
         self.playerHeight = playerHeight
-        self.white = WHITE
+        self.playerColor = WHITE
 
 
     def draw(self, gameDisplay):
-        pygame.draw.rect(gameDisplay, self.white, (self.playerX, self.playerY, self.playerWidth, self.playerHeight) )
+        pygame.draw.rect(gameDisplay, self.playerColor, (self.playerX, self.playerY, self.playerWidth, self.playerHeight) )
     def movement(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                self.playerYVelocity = -8;
+                self.playerYVelocity = -8
+                self.playerY += self.playerYVelocity
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_SPACE:
-                    self.playerYVelocity = 0;
-        self.playerY += self.playerYVelocity
+                    self.playerYVelocity = 0
 
 
 def gameLoop():
