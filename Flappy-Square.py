@@ -1,4 +1,5 @@
 import pygame
+import random
 
 class Game:
     def __init__(self):
@@ -15,7 +16,8 @@ class Game:
         # Colors
         self.WHITE = (255, 255, 255)
         self.BLACK = (0, 0, 0)
-
+        self.YELLOW = (255, 255, 0) 
+        self.GREEN = (0, 0, 255)
 
     def eventHandleing(self):
         for self.event in pygame.event.get():
@@ -23,13 +25,13 @@ class Game:
                 self.running = False
 
             if self.event.type == pygame.KEYDOWN:
-                if self.event.key == pygame.K_UP:
-                    player.playerYAcc = -0.5
-                if self.event.key == pygame.K_DOWN:
-                    player.playerYAcc = 0.5
-            if self.event.type == pygame.KEYUP:
-                if self.event.key == pygame.K_UP or self.event.key == pygame.K_DOWN:
-                    player.playerYAcc = 0
+                if self.event.key == pygame.K_SPACE:
+                    player.playerYVel = -10
+            
+            if pipe.pipesX < 0 + pipe.pipeWidth:
+                pipe.pipesX = self.WIDTH + 10
+                pipe.pipeHeight = random.randint(100, 400)
+
 
                     
 class Player:
@@ -37,14 +39,15 @@ class Player:
         self.playerX = game.WIDTH/3
         self.playerY = 300
         self.playerYVel = 0
+        self.playerXVel = 0
         self.playerWidth = 20
         self.playerHeight = 20
-        self.playerYAcc = 0
+        self.playerYAcc = 0.5
         #self.playerFriction = -0.13
         
 
     def draw(self):
-        pygame.draw.rect(game.screen, game.WHITE, (self.playerX, self.playerY, self.playerWidth, self.playerHeight))
+        pygame.draw.rect(game.screen, game.YELLOW, (self.playerX, self.playerY, self.playerWidth, self.playerHeight))
 
     def movement(self):
         # Motion
@@ -53,19 +56,33 @@ class Player:
         self.playerYVel += self.playerYAcc 
 
         self.playerY += self.playerYVel + self.playerYAcc/2
+
  
-        
+class Pipes:
+    def __init__(self):
+        self.pipeWidth = 10
+        self.pipeHeight = random.randint(100, 400)
+        self.pipesX = game.WIDTH + 10
+        self.pipesY = 0
+    
+    def draw(self):
+        pygame.draw.rect(game.screen, game.GREEN, (self.pipesX, self.pipesY, self.pipeWidth, self.pipeHeight))
+
+    def movement(self):
+        self.pipesX -= 3
+
 game = Game()
 player = Player()
+pipe = Pipes()
 
 while game.running:
     game.eventHandleing()
 
     player.draw() 
-
     player.movement()
-    print("Acc " + str(player.playerYAcc))
-    print("Vel " + str(player.playerYVel))
+
+    pipe.draw()
+    pipe.movement()
 
     pygame.display.update()
     game.screen.fill(game.BLACK)
