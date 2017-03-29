@@ -1,66 +1,74 @@
-import pygame, random;
+import pygame
 
-pygame.init();
+class Game:
+    def __init__(self):
+        pygame.init()
+        self.WIDTH = 640
+        self.HEIGHT = 480
+        self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
+        pygame.display.set_caption("Flappy Square")
+        self.clock = pygame.time.Clock()
+        self.FPS = 60
 
-SCREENWIDTH = 640;
-SCREENHEIGHT = 480;
-gameDisplay = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT));
+        self.running = True
 
-pygame.display.set_caption("Flappy Square");
-
-fps = pygame.time.Clock();
-
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-
-                  
-class player:
-    def __init__(self, playerX, playerY, playerXVelocity, playerYVelocity, playerWidth, playerHeight, WHITE):
-        self.playerX = playerX
-        self.playerY = playerY
-        self.playerXVelocity = playerXVelocity
-        self.playerYVelocity = playerYVelocity
-        self.playerWidth = playerWidth
-        self.playerHeight = playerHeight
-        self.playerColor = WHITE
+        # Colors
+        self.WHITE = (255, 255, 255)
+        self.BLACK = (0, 0, 0)
 
 
-    def draw(self, gameDisplay):
-        pygame.draw.rect(gameDisplay, self.playerColor, (self.playerX, self.playerY, self.playerWidth, self.playerHeight) )
-    def movement(self, event):
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                self.playerYVelocity = -8
-                self.playerY += self.playerYVelocity
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_SPACE:
-                    self.playerYVelocity = 0
+    def eventHandleing(self):
+        for self.event in pygame.event.get():
+            if self.event.type == pygame.QUIT:
+                self.running = False
 
+            if self.event.type == pygame.KEYDOWN:
+                if self.event.key == pygame.K_UP:
+                    player.playerYAcc = -0.5
+                if self.event.key == pygame.K_DOWN:
+                    player.playerYAcc = 0.5
+            if self.event.type == pygame.KEYUP:
+                if self.event.key == pygame.K_UP or self.event.key == pygame.K_DOWN:
+                    player.playerYAcc = 0
 
-def gameLoop():
-    running = True;
-    playerX = 200
-    playerY = 200
-    playerXVelocity = 0
-    playerYVelocity = 0
-    playerWidth = 10
-    playerHeight = 10
+                    
+class Player:
+    def __init__(self):
+        self.playerX = game.WIDTH/3
+        self.playerY = 300
+        self.playerYVel = 0
+        self.playerWidth = 20
+        self.playerHeight = 20
+        self.playerYAcc = 0
+        #self.playerFriction = -0.13
+        
 
-    player1 = player(playerX, playerY, playerXVelocity, playerYVelocity, playerWidth, playerHeight, WHITE)
-    while running == True:
-        # Event handling
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False;
-            player1.movement(event)
+    def draw(self):
+        pygame.draw.rect(game.screen, game.WHITE, (self.playerX, self.playerY, self.playerWidth, self.playerHeight))
 
-        player1.draw(gameDisplay)
+    def movement(self):
+        # Motion
+        #self.playerYAcc += self.playerYVel * self.playerFriction
 
-        #Updating the screen
-        pygame.display.update();
-        gameDisplay.fill(BLACK)
-        fps.tick(60);
+        self.playerYVel += self.playerYAcc 
 
-gameLoop();
-pygame.quit();
-quit();
+        self.playerY += self.playerYVel + self.playerYAcc/2
+ 
+        
+game = Game()
+player = Player()
+
+while game.running:
+    game.eventHandleing()
+
+    player.draw() 
+
+    player.movement()
+    print("Acc " + str(player.playerYAcc))
+    print("Vel " + str(player.playerYVel))
+
+    pygame.display.update()
+    game.screen.fill(game.BLACK)
+    game.clock.tick(game.FPS)
+pygame.quit()
+quit()
