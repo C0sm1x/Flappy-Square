@@ -30,7 +30,7 @@ class Game:
             
             if pipe.pipesX < 0 + pipe.pipeWidth:
                 pipe.pipesX = self.WIDTH + 10
-                pipe.pipeHeight = random.randint(100, 400)
+                pipe.pipeHeight = random.randint(100, 200)
 
 
                     
@@ -43,7 +43,6 @@ class Player:
         self.playerWidth = 20
         self.playerHeight = 20
         self.playerYAcc = 0.5
-        #self.playerFriction = -0.13
         
 
     def draw(self):
@@ -61,12 +60,15 @@ class Player:
 class Pipes:
     def __init__(self):
         self.pipeWidth = 10
-        self.pipeHeight = random.randint(100, 400)
+        self.pipeHeight = random.randint(100, 200)
         self.pipesX = game.WIDTH + 10
         self.pipesY = 0
     
-    def draw(self):
+    def drawtoppipe(self):
         pygame.draw.rect(game.screen, game.GREEN, (self.pipesX, self.pipesY, self.pipeWidth, self.pipeHeight))
+
+    def drawbottompipe(self):
+        pygame.draw.rect(game.screen, game.GREEN, (self.pipesX, game.HEIGHT, self.pipeWidth, self.pipeHeight * -1 + player.playerHeight))
 
     def movement(self):
         self.pipesX -= 3
@@ -81,7 +83,8 @@ while game.running:
     player.draw() 
     player.movement()
 
-    pipe.draw()
+    pipe.drawtoppipe()
+    pipe.drawbottompipe()
     pipe.movement()
 
     pygame.display.update()
