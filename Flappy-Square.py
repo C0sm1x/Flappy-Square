@@ -13,12 +13,13 @@ class Game:
         self.FPS = 60
 
         self.running = True
+        self.isOnGameOverScreen = False
 
         # Colors
         self.WHITE = (255, 255, 255)
         self.BLACK = (0, 0, 0)
         self.YELLOW = (255, 255, 0) 
-        self.GREEN = (0, 0, 255)
+        self.GREEN = (0, 205, 0)
 
     def eventHandleing(self):
         for self.event in pygame.event.get():
@@ -35,10 +36,24 @@ class Game:
             
     def collision(self):
         if player.playerX < pipe.pipesX + pipe.pipeWidth and player.playerX + player.playerWidth > pipe.pipesX and player.playerY < pipe.pipesY + pipe.pipeHeight and player.playerHeight + player.playerY > pipe.pipesY:             
-            time.sleep(2)
+            self.isOnGameOverScreen = True
+        else:
+            self.isOnGameOverScreen = False
+
 
         if player.playerX < pipe.pipesX + pipe.pipeWidth and player.playerX + player.playerWidth > pipe.pipesX and player.playerY > pipe.pipes2Y + pipe.pipe2Height and player.playerHeight + player.playerY < pipe.pipes2Y:             
-            time.sleep(2)
+            self.isOnGameOverScreen = True
+
+    def gameOver(self):
+        gameOverFont = pygame.font.SysFont("monospace", 25)
+        gameOverText = gameOverFont.render("Game Over", True, self.WHITE)
+        while self.isOnGameOverScreen:
+            self.screen.fill(self.BLACK)
+            self.screen.blit(gameOverText, (self.WIDTH/2, self.HEIGHT/2))
+            if self.event.key == pygame.K_RETURN:
+                break
+
+
 class Player:
     def __init__(self):
         self.playerX = game.WIDTH/3
@@ -95,6 +110,9 @@ while game.running:
     pipe.drawtoppipe()
     pipe.drawbottompipe()
     pipe.movement()
+
+    if game.isOnGameOverScreen == True:
+        game.gameOver()
 
     pygame.display.update()
     game.screen.fill(game.BLACK)
