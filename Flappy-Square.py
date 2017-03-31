@@ -1,5 +1,6 @@
 import pygame
 import random
+import time
 
 class Game:
     def __init__(self):
@@ -23,17 +24,21 @@ class Game:
         for self.event in pygame.event.get():
             if self.event.type == pygame.QUIT:
                 self.running = False
-
-            if self.event.type == pygame.KEYDOWN:
-                if self.event.key == pygame.K_SPACE:
+            if self.event.type == pygame.KEYDOWN: 
+                if self.event.key == pygame.K_SPACE: 
                     player.playerYVel = -10
             
-            if pipe.pipesX < 0 + pipe.pipeWidth:
-                pipe.pipesX = self.WIDTH + 10
-                pipe.pipeHeight = random.randint(100, 200)
+        if pipe.pipesX < 0 + pipe.pipeWidth:
+            pipe.pipesX = self.WIDTH + 10
+            pipe.pipeHeight = random.randint(100, 200)
+            pipe.pipe2Height = random.randint(100, 200) * -1
+            
+    def collision(self):
+        if player.playerX < pipe.pipesX + pipe.pipeWidth and player.playerX + player.playerWidth > pipe.pipesX and player.playerY < pipe.pipesY + pipe.pipeHeight and player.playerHeight + player.playerY > pipe.pipesY:             
+            time.sleep(2)
 
-
-                    
+        if player.playerX < pipe.pipesX + pipe.pipeWidth and player.playerX + player.playerWidth > pipe.pipesX and player.playerY > pipe.pipes2Y + pipe.pipe2Height and player.playerHeight + player.playerY < pipe.pipes2Y:             
+            time.sleep(2)
 class Player:
     def __init__(self):
         self.playerX = game.WIDTH/3
@@ -50,8 +55,6 @@ class Player:
 
     def movement(self):
         # Motion
-        #self.playerYAcc += self.playerYVel * self.playerFriction
-
         self.playerYVel += self.playerYAcc 
 
         self.playerY += self.playerYVel + self.playerYAcc/2
@@ -63,15 +66,20 @@ class Pipes:
         self.pipeHeight = random.randint(100, 200)
         self.pipesX = game.WIDTH + 10
         self.pipesY = 0
+
+        self.pipes2Y = game.HEIGHT
+        self.pipe2Height = self.pipeHeight * -1 + player.playerHeight
     
     def drawtoppipe(self):
         pygame.draw.rect(game.screen, game.GREEN, (self.pipesX, self.pipesY, self.pipeWidth, self.pipeHeight))
 
     def drawbottompipe(self):
-        pygame.draw.rect(game.screen, game.GREEN, (self.pipesX, game.HEIGHT, self.pipeWidth, self.pipeHeight * -1 + player.playerHeight))
+        pygame.draw.rect(game.screen, game.GREEN, (self.pipesX, pipe.pipes2Y, self.pipeWidth, self.pipe2Height))
 
     def movement(self):
         self.pipesX -= 3
+    
+    
 
 game = Game()
 player = Player()
@@ -79,6 +87,7 @@ pipe = Pipes()
 
 while game.running:
     game.eventHandleing()
+    game.collision()
 
     player.draw() 
     player.movement()
