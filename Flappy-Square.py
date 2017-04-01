@@ -28,30 +28,40 @@ class Game:
             if self.event.type == pygame.KEYDOWN: 
                 if self.event.key == pygame.K_SPACE: 
                     player.playerYVel = -10
-            
+
+                if self.event.key == pygame.K_RETURN and self.isOnGameOverScreen == True:
+                    self.isOnGameOverScreen = False    
+
         if pipe.pipesX < 0 + pipe.pipeWidth:
             pipe.pipesX = self.WIDTH + 10
             pipe.pipeHeight = random.randint(100, 200)
             pipe.pipe2Height = random.randint(100, 200) * -1
             
+        
+
     def collision(self):
         if player.playerX < pipe.pipesX + pipe.pipeWidth and player.playerX + player.playerWidth > pipe.pipesX and player.playerY < pipe.pipesY + pipe.pipeHeight and player.playerHeight + player.playerY > pipe.pipesY:             
             self.isOnGameOverScreen = True
-        else:
-            self.isOnGameOverScreen = False
 
 
         if player.playerX < pipe.pipesX + pipe.pipeWidth and player.playerX + player.playerWidth > pipe.pipesX and player.playerY > pipe.pipes2Y + pipe.pipe2Height and player.playerHeight + player.playerY < pipe.pipes2Y:             
             self.isOnGameOverScreen = True
 
+    def reset(self):
+        player.playerX = self.WIDTH/2
+        player.playerY = 300
+        pipe.pipesX =  self.WIDTH + 10
+        player.playerYVel = 0
+        
     def gameOver(self):
         gameOverFont = pygame.font.SysFont("monospace", 25)
         gameOverText = gameOverFont.render("Game Over", True, self.WHITE)
         while self.isOnGameOverScreen:
             self.screen.fill(self.BLACK)
             self.screen.blit(gameOverText, (self.WIDTH/2, self.HEIGHT/2))
-            if self.event.key == pygame.K_RETURN:
-                break
+            break
+
+        self.reset()
 
 
 class Player:
