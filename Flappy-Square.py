@@ -14,6 +14,7 @@ class Game:
 
         self.running = True
         self.isOnGameOverScreen = False
+        self.isOnStartScreen = True
 
         # Colors
         self.WHITE = (255, 255, 255)
@@ -21,16 +22,27 @@ class Game:
         self.YELLOW = (255, 255, 0) 
         self.GREEN = (0, 205, 0)
 
+        self.fontSize = 45
+        self.gameFont = pygame.font.SysFont("monospace", self.fontSize)
+        self.gameInstructionsFont = pygame.font.SysFont("monospace", self.fontSize - 20)
+    
     def eventHandleing(self):
         for self.event in pygame.event.get():
             if self.event.type == pygame.QUIT:
                 self.running = False
             if self.event.type == pygame.KEYDOWN: 
                 if self.event.key == pygame.K_SPACE: 
-                    player.playerYVel = -10
+                    player.playerYVel = -10    
+
+                if self.event.key == pygame.K_RETURN and self.isOnStartScreen == True:
+                    self.isOnStartScreen = False
+                    player.playerYAcc = 0.5
+                    pipe.pipeVel = -3
 
                 if self.event.key == pygame.K_RETURN and self.isOnGameOverScreen == True:
-                    self.isOnGameOverScreen = False    
+                    self.isOnGameOverScreen = False
+                    self.isOnStartScreen = True
+
 
         if pipe.pipesX < 0 + pipe.pipeWidth:
             pipe.pipesX = self.WIDTH + 10
@@ -47,21 +59,39 @@ class Game:
         if player.playerX < pipe.pipesX + pipe.pipeWidth and player.playerX + player.playerWidth > pipe.pipesX and player.playerY > pipe.pipes2Y + pipe.pipe2Height and player.playerHeight + player.playerY < pipe.pipes2Y:             
             self.isOnGameOverScreen = True
 
-    def reset(self):
-        player.playerX = self.WIDTH/2
-        player.playerY = 300
-        pipe.pipesX =  self.WIDTH + 10
-        player.playerYVel = 0
-        
-    def gameOver(self):
-        gameOverFont = pygame.font.SysFont("monospace", 25)
-        gameOverText = gameOverFont.render("Game Over", True, self.WHITE)
-        while self.isOnGameOverScreen:
-            self.screen.fill(self.BLACK)
-            self.screen.blit(gameOverText, (self.WIDTH/2, self.HEIGHT/2))
-            break
+    def newGame(self):
+        if self.isOnStartScreen == False:
+            self.isOnStartScreen == True
 
-        self.reset()
+        if self.isOnGameOverScreen == True:
+            player.playerX = self.WIDTH/3
+            player.playerY = 300
+            pipe.pipesX =  self.WIDTH + 10
+            player.playerYVel = 0
+
+    def gameOver(self):
+        gameOverText = self.gameFont.render("Game Over", True, self.WHITE)
+        continueText = self.gameInstructionsFont.render("Press enter to continue", True,  self.WHITE)
+
+        if self.isOnGameOverScreen == True and self.isOnStartScreen == False:
+            while self.isOnGameOverScreen:
+                self.screen.fill(self.BLACK)
+                self.screen.blit(gameOverText, (self.WIDTH/3, self.HEIGHT/2))
+                self.screen.blit(continueText, (self.WIDTH/4,self.HEIGHT/1.5))
+                break
+
+    def startScreen(self):
+        startScreenText = self.gameFont.render("Flappy Square", True, self.WHITE)    
+        pressSpaceKeyToJumpText = self.gameInstructionsFont.render("Press the space key to jump", True, self.WHITE)
+        if self.isOnStartScreen == True and self.isOnGameOverScreen == False:
+            while self.isOnStartScreen:
+                player.playerYVel = 0
+                player.playerYAcc = 0
+                pipe.pipeVel = 0
+                self.screen.fill(self.BLACK)
+                self.screen.blit(startScreenText, (self.WIDTH/4, self.HEIGHT/2))
+                self.screen.blit(pressSpaceKeyToJumpText, (self.WIDTH/5, self.HEIGHT/1.5))
+                break
 
 
 class Player:
@@ -94,6 +124,8 @@ class Pipes:
 
         self.pipes2Y = game.HEIGHT
         self.pipe2Height = self.pipeHeight * -1 + player.playerHeight
+
+        self.pipeVel = -3
     
     def drawtoppipe(self):
         pygame.draw.rect(game.screen, game.GREEN, (self.pipesX, self.pipesY, self.pipeWidth, self.pipeHeight))
@@ -102,7 +134,7 @@ class Pipes:
         pygame.draw.rect(game.screen, game.GREEN, (self.pipesX, pipe.pipes2Y, self.pipeWidth, self.pipe2Height))
 
     def movement(self):
-        self.pipesX -= 3
+        self.pipesX += self.pipeVel
     
     
 
@@ -115,17 +147,22 @@ while game.running:
     game.collision()
 
     player.draw() 
-    player.movement()
 
     pipe.drawtoppipe()
     pipe.drawbottompipe()
     pipe.movement()
 
-    if game.isOnGameOverScreen == True:
-        game.gameOver()
+    game.startScreen()
+
+    game.gameOver()
+
+    player.movement()
+
+    game.newGame()
 
     pygame.display.update()
     game.screen.fill(game.BLACK)
     game.clock.tick(game.FPS)
+
 pygame.quit()
 quit()
