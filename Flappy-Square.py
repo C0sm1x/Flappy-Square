@@ -1,6 +1,6 @@
 import pygame
 import random
-import time
+import os
 
 class Game:
     def __init__(self):
@@ -37,7 +37,7 @@ class Game:
                 if self.event.key == pygame.K_RETURN and self.isOnStartScreen == True:
                     self.isOnStartScreen = False
                     player.playerYAcc = 0.5
-                    pipe.pipeVel = -3
+                    pipe.pipeVel = -5
 
                 if self.event.key == pygame.K_RETURN and self.isOnGameOverScreen == True:
                     self.isOnGameOverScreen = False
@@ -48,6 +48,10 @@ class Game:
             pipe.pipesX = self.WIDTH + 10
             pipe.pipeHeight = random.randint(100, 200)
             pipe.pipe2Height = random.randint(100, 200) * -1
+
+            pipe.pipeVel -=1
+            if pipe.pipeVel < -15:
+                pipe.pipeVel = -15
             
         
 
@@ -76,8 +80,8 @@ class Game:
         if self.isOnGameOverScreen == True and self.isOnStartScreen == False:
             while self.isOnGameOverScreen:
                 self.screen.fill(self.BLACK)
-                self.screen.blit(gameOverText, (self.WIDTH/3, self.HEIGHT/2))
-                self.screen.blit(continueText, (self.WIDTH/4,self.HEIGHT/1.5))
+                self.screen.blit(gameOverText, (self.WIDTH/3, self.HEIGHT/3))
+                self.screen.blit(continueText, (self.WIDTH/4,self.HEIGHT/2.2))
                 break
 
     def startScreen(self):
@@ -89,8 +93,8 @@ class Game:
                 player.playerYAcc = 0
                 pipe.pipeVel = 0
                 self.screen.fill(self.BLACK)
-                self.screen.blit(startScreenText, (self.WIDTH/4, self.HEIGHT/2))
-                self.screen.blit(pressSpaceKeyToJumpText, (self.WIDTH/5, self.HEIGHT/1.5))
+                self.screen.blit(startScreenText, (self.WIDTH/4, self.HEIGHT/3))
+                self.screen.blit(pressSpaceKeyToJumpText, (self.WIDTH/5, self.HEIGHT/2.2))
                 break
 
 
@@ -125,7 +129,7 @@ class Pipes:
         self.pipes2Y = game.HEIGHT
         self.pipe2Height = self.pipeHeight * -1 + player.playerHeight
 
-        self.pipeVel = -3
+        self.pipeVel = -5
     
     def drawtoppipe(self):
         pygame.draw.rect(game.screen, game.GREEN, (self.pipesX, self.pipesY, self.pipeWidth, self.pipeHeight))
