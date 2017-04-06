@@ -11,6 +11,7 @@ class Game:
         pygame.display.set_caption("Flappy Square")
         self.clock = pygame.time.Clock()
         self.FPS = 60
+        self.score = 0
 
         self.running = True
         self.isOnGameOverScreen = False
@@ -25,6 +26,7 @@ class Game:
         self.fontSize = 45
         self.gameFont = pygame.font.SysFont("monospace", self.fontSize)
         self.gameInstructionsFont = pygame.font.SysFont("monospace", self.fontSize - 20)
+        self.gameScoreFont = pygame.font.SysFont("monospace", self.fontSize -10)
     
     def eventHandleing(self):
         for self.event in pygame.event.get():
@@ -37,7 +39,7 @@ class Game:
                 if self.event.key == pygame.K_RETURN and self.isOnStartScreen == True:
                     self.isOnStartScreen = False
                     player.playerYAcc = 0.5
-                    pipe.pipeVel = -5
+                    pipe.pipeVel = -10
 
                 if self.event.key == pygame.K_RETURN and self.isOnGameOverScreen == True:
                     self.isOnGameOverScreen = False
@@ -49,10 +51,9 @@ class Game:
             pipe.pipeHeight = random.randint(100, 200)
             pipe.pipe2Height = random.randint(100, 200) * -1
 
-            pipe.pipeVel -=1
-            if pipe.pipeVel < -15:
-                pipe.pipeVel = -15
-            
+
+        if player.playerY > pipe.pipeHeight and player.playerY < pipe.pipe2Height + pipe.pipes2Y and player.playerX == pipe.pipesX:
+            self.score +=1
         
 
     def collision(self):
@@ -68,7 +69,8 @@ class Game:
             self.isOnStartScreen == True
 
         if self.isOnGameOverScreen == True:
-            player.playerX = self.WIDTH/3
+            player.playerX = 120
+            self.score = 0
             player.playerY = 300
             pipe.pipesX =  self.WIDTH + 10
             player.playerYVel = 0
@@ -85,25 +87,27 @@ class Game:
                 break
 
     def startScreen(self):
-        startScreenText = self.gameFont.render("Flappy Square", True, self.WHITE)    
-        pressSpaceKeyToJumpText = self.gameInstructionsFont.render("Press the space key to jump", True, self.WHITE)
+        self.startScreenText = self.gameFont.render("Flappy Square", True, self.WHITE)    
+        self.pressSpaceKeyToJumpText = self.gameInstructionsFont.render("Press the space key to jump", True, self.WHITE)
         if self.isOnStartScreen == True and self.isOnGameOverScreen == False:
             while self.isOnStartScreen:
                 player.playerYVel = 0
                 player.playerYAcc = 0
                 pipe.pipeVel = 0
                 self.screen.fill(self.BLACK)
-                self.screen.blit(startScreenText, (self.WIDTH/4, self.HEIGHT/3))
-                self.screen.blit(pressSpaceKeyToJumpText, (self.WIDTH/5, self.HEIGHT/2.2))
+                self.screen.blit(self.startScreenText, (self.WIDTH/4, self.HEIGHT/3))
+                self.screen.blit(self.pressSpaceKeyToJumpText, (self.WIDTH/5, self.HEIGHT/2.2))
                 break
 
+    def gamescore(self):
+        self.gameScoreText = self.gameScoreFont.render(str(self.score), True, self.WHITE)
+        self.screen.blit(self.gameScoreText, (self.WIDTH/2, self.HEIGHT * 0))
 
 class Player:
     def __init__(self):
-        self.playerX = game.WIDTH/3
+        self.playerX = 120
         self.playerY = 300
         self.playerYVel = 0
-        self.playerXVel = 0
         self.playerWidth = 20
         self.playerHeight = 20
         self.playerYAcc = 0.5
@@ -127,9 +131,9 @@ class Pipes:
         self.pipesY = 0
 
         self.pipes2Y = game.HEIGHT
-        self.pipe2Height = self.pipeHeight * -1 + player.playerHeight
+        self.pipe2Height = self.pipeHeight * -1 
 
-        self.pipeVel = -5
+        self.pipeVel = -10
     
     def drawtoppipe(self):
         pygame.draw.rect(game.screen, game.GREEN, (self.pipesX, self.pipesY, self.pipeWidth, self.pipeHeight))
@@ -162,7 +166,9 @@ while game.running:
 
     player.movement()
 
+    game.gamescore()
     game.newGame()
+    print(str(pipe.pipesX) + " " + str(player.playerX))
 
     pygame.display.update()
     game.screen.fill(game.BLACK)
